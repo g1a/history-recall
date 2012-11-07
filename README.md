@@ -8,9 +8,9 @@ For a quick start, scroll down for installation and usage.
 
 INTRODUCTION
 
-----------------------------------------------------
 > Those who forget the past are doomed to retype it.
->         - [George Santayana][1] (paraphrased)
+>
+> [George Santayana][1] (paraphrased)
 ----------------------------------------------------
 
 The history recall project helps organize your bash history.
@@ -52,7 +52,8 @@ to do is source this file.  First, clone the project from github:
 
 Then source the file when your bash shell starts up.
 
-*In ~/.bashrc
+In ~/.bashrc:
+
     source ~/local/history-recall/historyrc
 
 Once you have installed History Recall, you must either re-source
