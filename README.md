@@ -1,4 +1,5 @@
 HISTORY RECALL PROJECT
+======================
 
 Manage bash history from multiple terminal windows in a sane and
 rational way.
@@ -7,6 +8,7 @@ For a quick start, scroll down for installation and usage.
 
 
 INTRODUCTION
+------------
 
 > "Those who forget the past are doomed to retype it."
 >      - [George Santayana][1] (paraphrased)
@@ -35,11 +37,85 @@ History Recall is just such a solution.
 
 
 USAGE
+-----
 
-Docs to-be-written.  See the script itself.
+### 'hgrep': Search history in all terminal windows ###
 
+    $ hgrep <regex>
+
+The hgrep command works just like `history | grep <regex>`, save
+for the fact that the later searches only the history of the current
+terminal window, whereas hgrep searches history in all windows.
+
+    $ hgrep apt-get
+    bash_nagai_dev_pts_9:sudo apt-get install chromium-browser
+    bash_nagai_dev_pts_5:sudo apt-get install rdesktop
+    bash_nagai_dev_pts_5:sudo apt-get install traceroute
+    bash_nagai_dev_pts_0:sudo apt-get remove gnome-session-fallback
+    bash_nagai_dev_pts_0:sudo apt-get install php-doc
+
+By default, the history files are named after the tty attached to
+the terminal window they are running in.  (You can see the tty
+of the current window using the 'tty' command.) The history file that
+is associated with the current window will be shown last, at the bottom
+of all of the output.
+
+### 'termial': Bring the given terminal number frontmost ###
+
+    $ terminal <number>
+
+The terminal command will switch to the desktop containing the terminal
+window attached to the specified tty and activate it.
+
+    $ terminal 9
+
+This command will switch to the window containing the terminal
+where 'apt-get install chromium-browser' was executed in the
+last example.
+
+### 'note' and 'recall': Write a note into history ###
+
+    $ note <command> // <comment>
+    $ recall <comment>
+
+The 'note' command will execute the given command and will
+write it, allong with the provided command and all of its
+command output into the command history. The 'recall' command
+will print out the saved information later.
+
+    $ note ls // initial contents
+    historyrc
+    README.md
+    $ recall "initial contents"
+    # Thu Nov  8 15:29:52 PST 2012
+    $ ls // initial contents
+    historyrc
+    README.md
+
+### 'task' and 'finished': Create a named task for history ###
+
+    $ task <label>
+    $ finished
+
+The 'task' and 'finished' commands
+
+    $ task Install whizzy-fu pro
+    begin task: Install whizzy-fu pro
+    $ sudu apt-get install whizzyfu libwhizzyfu-dev
+    $ ... lots of other stuff
+    $ finished
+    finished task: Install whizzy-fu pro
+
+... a few days later, in a different terminal:
+
+    $ recall whizzy
+    # Fri Oct 12 11:06:43 PDT 2012
+    recalled task: Install whizzy-fu pro
+    $ ^Rapt-get
+    (reverse-i-search)`sudo apt-get': sudo apt-get install whizzyfu libwhizzyfu-dev
 
 INSTALLATION
+------------
 
 The History Recall commands are all implemented as bash functions
 defined in a single historyrc file.  To install, all that you need
