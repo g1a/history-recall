@@ -10,7 +10,7 @@ For a quick start, scroll down for installation and usage.
 INTRODUCTION
 ------------
 
-> "Those who forget the past are doomed to retype it."
+> "Those who forget the past are doomed to retype it."  
 >      - [George Santayana][1] (paraphrased)
 
 The history recall project helps organize your bash history.
@@ -41,7 +41,7 @@ USAGE
 
 ### 'hgrep': Search history in all terminal windows ###
 
-> $ hgrep <regex>
+> $ hgrep &lt;regex&gt;
 
 The hgrep command works just like `history | grep <regex>`, save
 for the fact that the later searches only the history of the current
@@ -62,7 +62,7 @@ of all of the output.
 
 ### 'termial': Bring the given terminal number frontmost ###
 
-> $ terminal <number>
+> $ terminal &lt;number&gt;
 
 The terminal command will switch to the desktop containing the terminal
 window attached to the specified tty and activate it.
@@ -75,8 +75,8 @@ last example.
 
 ### 'note' and 'recall': Write a note into history ###
 
-> $ note <command> // <comment>
-> $ recall <comment>
+> $ note &lt;command&gt; // &lt;comment&gt;  
+> $ recall &lt;comment&gt;
 
 The 'note' command will execute the given command and will
 write it, allong with the provided command and all of its
@@ -94,7 +94,7 @@ will print out the saved information later.
 
 ### 'task' and 'finished': Create a named task for history ###
 
-> $ task <label>
+> $ task &lt;label&gt;  
 > $ finished
 
 The 'task' and 'finished' commands
