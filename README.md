@@ -41,7 +41,7 @@ USAGE
 
 ### 'hgrep': Search history in all terminal windows ###
 
-    $ hgrep <regex>
+> $ hgrep <regex>
 
 The hgrep command works just like `history | grep <regex>`, save
 for the fact that the later searches only the history of the current
@@ -62,7 +62,7 @@ of all of the output.
 
 ### 'termial': Bring the given terminal number frontmost ###
 
-    $ terminal <number>
+> $ terminal <number>
 
 The terminal command will switch to the desktop containing the terminal
 window attached to the specified tty and activate it.
@@ -75,8 +75,8 @@ last example.
 
 ### 'note' and 'recall': Write a note into history ###
 
-    $ note <command> // <comment>
-    $ recall <comment>
+> $ note <command> // <comment>
+> $ recall <comment>
 
 The 'note' command will execute the given command and will
 write it, allong with the provided command and all of its
@@ -94,8 +94,8 @@ will print out the saved information later.
 
 ### 'task' and 'finished': Create a named task for history ###
 
-    $ task <label>
-    $ finished
+> $ task <label>
+> $ finished
 
 The 'task' and 'finished' commands
 
