@@ -8,10 +8,8 @@ For a quick start, scroll down for installation and usage.
 
 INTRODUCTION
 
-----------------------------------------------------
-"Those who forget the past are doomed to retype it."
-[George Santayana][1] (paraphrased)
-----------------------------------------------------
+> "Those who forget the past are doomed to retype it."
+>      - [George Santayana][1] (paraphrased)
 
 The history recall project helps organize your bash history.
 If you have ever been in the position where you are trying
