@@ -8,9 +8,9 @@ For a quick start, scroll down for installation and usage.
 
 INTRODUCTION
 
-> Those who forget the past are doomed to retype it.
->
-> [George Santayana][1] (paraphrased)
+----------------------------------------------------
+"Those who forget the past are doomed to retype it."
+[George Santayana][1] (paraphrased)
 ----------------------------------------------------
 
 The history recall project helps organize your bash history.
@@ -45,7 +45,12 @@ INSTALLATION
 
 The History Recall commands are all implemented as bash functions
 defined in a single historyrc file.  To install, all that you need
-to do is source this file.  First, clone the project from github:
+to do is source this file.  If you are using the [utiliscripts][3]
+project, history-recall is installed automatically via the move-in
+script.  To use history-recall without running move-in, you can follow
+the installation instructions below.
+
+First, clone the project from github:
 
     cd ~/local
     git clone https://github.com/greg-1-anderson/history-recall
@@ -66,4 +71,4 @@ Nifty.
 
 [1]: http://en.wikipedia.org/wiki/George_Santayana
 [2]: http://www.catonmat.net/blog/the-definitive-guide-to-bash-command-line-history/
-
+[3]: http://github.com/greg-1-anderson/utiliscripts
