@@ -2,18 +2,39 @@
 # c.f. http://www.catonmat.net/blog/the-definitive-guide-to-bash-command-line-history/
 shopt -s histappend
 shopt -s histreedit
+
+# Set the title of a Terminal window
+function history_settitle() {
+  if [ -n "$STY" ] ; then         # We are in a screen session
+    echo "Setting screen titles to $@"
+    printf "\033k%s\033\\" "$@"
+    screen -X eval "at \\# title $@" "shelltitle $@"
+  else
+    printf "\033]0;%s\007" "$@"
+  fi
+}
+
 mkdir -p $HOME/.history
+mkdir -p $HOME/.terminal
+TTY=$(tty | tr / _)
+HOSTNAME=$(hostname -s)
 # If $HISTFILE is in the home directory, then make a new history file unique to this tty
 if [ $(dirname "$HISTFILE") == "$HOME" ]
 then
-  TTY=$(tty | tr / _)
-  HOSTNAME=$(hostname -s)
   export HISTFILE="$HOME/.history/bash_${HOSTNAME}${TTY}"
   if [ -f "$HISTFILE" ]
   then
     history -r
   fi
 fi
+history_settitle "${HOSTNAME}${TTY}"
+# It takes a bit before wmctrl will see the result of the settitle;
+# once we have the window title, write the window id into the
+# corresponding .terminal file.
+sleep 0.1
+w=$(wmctrl -l | grep "${HOSTNAME}${TTY}" | sed -e 's/ .*//')
+echo $w > $HOME/.terminal/"${HOSTNAME}${TTY}"
+
 export HISTIGNORE="&:[ ]*:ls:hist.*:exit"
 export PROMPT_COMMAND="$PROMPT_COMMAND"'; HISTTIMEFORMAT="[%m/%d@%H:%M:%S] " history -a'
 
@@ -108,8 +129,25 @@ function tasks {
 function hgrep {
   (
     cd $HOME/.history
-    grep $* $HISTFILE $(ls -t | grep -v $(basename $HISTFILE)) | grep -v '^[^:]*:#'
+    grep $* $(ls -rt | grep -v $(basename $HISTFILE)) $(basename $HISTFILE)  | grep -v '^[^:]*:#'
   )
+}
+
+# Focus on the terminal specified by the user.
+function terminal() {
+  HOSTNAME=$(hostname -s)
+  p="${HOSTNAME}"'_.*_'"$1"
+  t=$(ls "$HOME/.terminal" | grep "$p")
+  if [ -f "$HOME/.terminal/$t" ] ; then
+    w=$(cat "$HOME/.terminal/$t")
+  else
+    w=$(wmctrl -l | grep "$p"'$' | sed -e 's/ .*//')
+  fi
+  if [ -n "$w" ] ; then
+    wmctrl -i -a "$w"
+  else
+    echo "Cound not find terminal $1; perhaps it is no longer open."
+  fi
 }
 
 # Show the output of a command passed to 'note', or switch back to a
@@ -192,4 +230,3 @@ function histpop {
   fi
   echo "HISTFILE restored to $HISTFILE"
 }
-
