@@ -28,7 +28,7 @@ then
   fi
 fi
 history_settitle "${HOSTNAME}${TTY}"
-if [ -n "$(which wmctrl)" ] ; then
+if [ -n "$(which wmctrl 2>/dev/null)" ] ; then
   # It takes a bit before wmctrl will see the result of the settitle;
   # once we have the window title, write the window id into the
   # corresponding .terminal file.
