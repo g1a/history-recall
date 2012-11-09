@@ -134,6 +134,21 @@ function hgrep {
   )
 }
 
+# Show all notes entered in the active terminal window
+function notes {
+  OLDIFS="$IFS"
+  IFS=$'\n'
+  for l in $(grep -H "^#[0-9]\+ >>.*$*" $HISTFILE) ; do
+    t=$(echo $l | sed -e 's/^[^#]*#\([0-9]\+\).*/\1/')
+    c=$(echo $l | sed -e 's/^[^>]*>> *//')
+    d=$(date --date="@$t")
+    n=${c#*:}
+    sn=${n%% //*}
+    echo "[$d]\$ $c"
+  done
+  IFS="$OLDIFS"
+}
+
 # Focus on the terminal specified by the user.
 function terminal() {
   HOSTNAME=$(hostname -s)
@@ -154,7 +169,7 @@ function terminal() {
 # Show the output of a command passed to 'note', or switch back to a
 # task (and corresponding history file) from the past.
 function recall {
-  l=$(cd  $HOME/.history && grep "^#[0-9]\+ >>.*$*" $HISTFILE $(ls -t) | tail -n 1)
+  l=$(cd  $HOME/.history && grep "^#[0-9]\+ >>.*$*" $(ls -t) $HISTFILE | tail -n 1)
   if [ -z "$l" ]
   then
     echo "recall: cannot find $*: No such note or task"
@@ -203,7 +218,7 @@ function recall {
 function histpush {
   if [ -n "$1" ]
   then
-    if [ -n "$HISTFILES" ]
+    if [ -z "$HISTFILES" ]
     then
       export HISTFILES="$HISTFILE"
     else
@@ -226,8 +241,8 @@ function histpop {
     else
       export HISTFILES="${HISTFILES#*:}"
     fi
+    echo "HISTFILE restored to $HISTFILE"
   else
     echo "histpop: HISTFILES is empty"
   fi
-  echo "HISTFILE restored to $HISTFILE"
 }

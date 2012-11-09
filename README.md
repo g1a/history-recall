@@ -10,7 +10,7 @@ For a quick start, scroll down for installation and usage.
 INTRODUCTION
 ------------
 
-> "Those who forget the past are doomed to retype it."  
+> "Those who forget the past are doomed to retype it."
 >      - [George Santayana][1] (paraphrased)
 
 The history recall project helps organize your bash history.
@@ -73,19 +73,25 @@ This command will switch to the window containing the terminal
 where 'apt-get install chromium-browser' was executed in the
 last example.
 
-### 'note' and 'recall': Write a note into history ###
+### 'note', 'notes' and 'recall': Write a note into history ###
 
-> $ note &lt;command&gt; // &lt;comment&gt;  
+> $ note &lt;command&gt; // &lt;comment&gt;
+> $ notes
 > $ recall &lt;comment&gt;
 
 The 'note' command will execute the given command and will
 write it, allong with the provided command and all of its
-command output into the command history. The 'recall' command
-will print out the saved information later.
+command output into the command history. The 'notes' command
+will list all of the notes taken, but only from those in
+the current terminal.  The 'recall' command will print out the
+information saved information later.  Note that 'recall' will
+find notes that were entered in any terminal.
 
     $ note ls // initial contents
     historyrc
     README.md
+    $ notes
+    [Thu Nov  8 15:29:52 PST 2012]$ ls // initial contents
     $ recall "initial contents"
     # Thu Nov  8 15:29:52 PST 2012
     $ ls // initial contents
@@ -94,7 +100,7 @@ will print out the saved information later.
 
 ### 'task' and 'finished': Create a named task for history ###
 
-> $ task &lt;label&gt;  
+> $ task &lt;label&gt;
 > $ finished
 
 The 'task' and 'finished' commands
