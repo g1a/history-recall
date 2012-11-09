@@ -28,13 +28,14 @@ then
   fi
 fi
 history_settitle "${HOSTNAME}${TTY}"
-# It takes a bit before wmctrl will see the result of the settitle;
-# once we have the window title, write the window id into the
-# corresponding .terminal file.
-sleep 0.1
-w=$(wmctrl -l | grep "${HOSTNAME}${TTY}" | sed -e 's/ .*//')
-echo $w > $HOME/.terminal/"${HOSTNAME}${TTY}"
-
+if [ -n "$(which wmctrl)" ] ; then
+  # It takes a bit before wmctrl will see the result of the settitle;
+  # once we have the window title, write the window id into the
+  # corresponding .terminal file.
+  sleep 0.1
+  w=$(wmctrl -l | grep "${HOSTNAME}${TTY}" | sed -e 's/ .*//')
+  echo $w > "$HOME/.terminal/${HOSTNAME}${TTY}"
+fi
 export HISTIGNORE="&:[ ]*:ls:hist.*:exit"
 export PROMPT_COMMAND="$PROMPT_COMMAND"'; HISTTIMEFORMAT="[%m/%d@%H:%M:%S] " history -a'
 
