@@ -5,36 +5,67 @@ shopt -s histreedit
 
 # Set the title of a Terminal window
 function history_settitle() {
-  if [ -n "$STY" ] ; then         # We are in a screen session
-    echo "Setting screen titles to $@"
-    printf "\033k%s\033\\" "$@"
-    screen -X eval "at \\# title $@" "shelltitle $@"
-  else
-    printf "\033]0;%s\007" "$@"
+  if [ -n "$DISPLAY" ] ; then
+    if [ -n "$STY" ] ; then         # We are in a screen session
+      echo "Setting screen titles to $@"
+      printf "\033k%s\033\\" "$@"
+      screen -X eval "at \\# title $@" "shelltitle $@"
+    else
+      printf "\033]0;%s\007" "$@"
+    fi
   fi
 }
 
+# We will store all of our history files in ~/.history, and we
+# will record information about our active terminals in ~/.terminal.
 mkdir -p $HOME/.history
 mkdir -p $HOME/.terminal
-TTY=$(tty | tr / _)
-HOSTNAME=$(hostname -s)
+
+# HIST_TTY records the tty that this history session is associated with,
+# and HIST_IDENTIFIER identifies the host and user this history belongs to.
+# Note that the user is only included if it is not already implied from $HOME
+# (e.g. after `sudo bash` $HOME will be /home/origuser and $USER will be root,
+# so the history file will be stored in /home/origuser/.history/bash_HOST_root_dev_pts_N)
+export HIST_TTY=$(tty | tr / _)
+HIST_IDENTIFIER=$(hostname -s)
+# If this terminal session was initiated via an ssh session, then we will use
+# the first word from '$SSH_CLIENT' instead of hostname -s in the history filename.
+if [ -n "$SSH_CLIENT" ] ; then
+  HIST_IDENTIFIER="${SSH_CLIENT%% *}"
+fi
+if [ "$(basename $HOME)" != "$USER" ]
+then
+  HIST_IDENTIFIER="${HIST_IDENTIFIER}_$USER"
+fi
+export HIST_IDENTIFIER
 # If $HISTFILE is in the home directory, then make a new history file unique to this tty
 if [ $(dirname "$HISTFILE") == "$HOME" ]
 then
-  export HISTFILE="$HOME/.history/bash_${HOSTNAME}${TTY}"
+  export HISTFILE="$HOME/.history/bash_${HIST_IDENTIFIER}${HIST_TTY}"
+  # If we are logged in as some other user (e.g. root), try to make
+  # our histfile accessible to the user that owns $HOME.
+  if [ "$(basename $HOME)" != "$USER" ]
+  then
+    touch $HISTFILE
+    chgrp $(basename $HOME) $HISTFILE
+    chmod g+rw $HISTFILE
+  fi
   if [ -f "$HISTFILE" ]
   then
     history -r
   fi
 fi
-history_settitle "${HOSTNAME}${TTY}"
-if [ -n "$(which wmctrl 2>/dev/null)" ] ; then
+
+trap "history_settitle $HIST_TTY; exit" 0
+export HISTORY_TITLE="${HIST_IDENTIFIER}${HIST_TTY}"
+history_settitle "$HISTORY_TITLE"
+if [ -n "$DISPLAY" ] && [ -n "$(which wmctrl 2>/dev/null)" ] ; then
   # It takes a bit before wmctrl will see the result of the settitle;
   # once we have the window title, write the window id into the
   # corresponding .terminal file.
   sleep 0.1
-  w=$(wmctrl -l | grep "${HOSTNAME}${TTY}" | sed -e 's/ .*//')
-  echo $w > "$HOME/.terminal/${HOSTNAME}${TTY}"
+  w=$(wmctrl -l | grep "${HIST_IDENTIFIER}${HIST_TTY}" | sed -e 's/ .*//')
+  echo $w > "$HOME/.terminal/${HIST_IDENTIFIER}${HIST_TTY}"
 fi
 export HISTIGNORE="&:[ ]*:ls:hist.*:exit"
 export PROMPT_COMMAND="$PROMPT_COMMAND"'; HISTTIMEFORMAT="[%m/%d@%H:%M:%S] " history -a'
@@ -89,8 +120,7 @@ function note {
 function task {
   t=$(date "+%s")
   task=$(echo $* | tr A-Z a-z | sed -e 's/ /_/g' -e 's/[^a-z0-9_]//g')
-  taskfile="$HOME/.history/task_$task"
-  history -a
+  taskfile="$HOME/.history/task_${HIST_IDENTIFIER}_$task"
   histpush "$taskfile"
   note echo "begin task: $*" // $HISTFILE
   echo "HISTFILE is now $HISTFILE"
@@ -109,29 +139,40 @@ function finished {
   fi
 }
 
-# Show all active nested tasks in this terminal
-function tasks {
+# Show all active tasks nested in this terminal
+function tasklist {
+  # $HISTFILES contains the stack of active tasks for this terminal
   for f in $HISTFILE $(echo $HISTFILES | tr : ' ') ; do
     if [ ${f:0:1} != '/' ]
     then
       f="$HOME/.history/$f"
     fi
     l=$(grep -Hm 1 "^#[0-9]\+ >>.*$*" $f)
-    t=$(echo $l | sed -e 's/^[^#]*#\([0-9]\+\).*/\1/')
-    c=$(echo $l | sed -e 's/^[^>]*>> *//')
-    d=$(date --date="@$t")
-    n=${c#*:}
-    sn=${n%% //*}
-    echo "$(basename $f):$sn // $d"
+    if [ -n "$l" ]
+    then
+      t=$(echo $l | sed -e 's/^[^#]*#\([0-9]\+\).*/\1/')
+      c=$(echo $l | sed -e 's/^[^>]*>> *//')
+      d=$(date --date="@$t")
+      n=${c#*:}
+      sn=${n%% //*}
+      echo "$(basename $f):$sn // $d"
+    fi
   done
 }
 
-# grep all history files for a command pattern
-function hgrep {
-  (
-    cd $HOME/.history
-    grep $* $(ls -rt | grep -v $(basename $HISTFILE)) $(basename $HISTFILE)  | grep -v '^[^:]*:#'
-  )
+# Show all tasks that are not finished
+function tasks {
+  for h in $(ls $HOME/.history/task_*) ; do
+    if [ -z "$(grep "^finished$" $h)" ] ; then
+      l=$(head -n 1 $h)
+      t=$(echo $l | sed -e 's/^[^#]*#\([0-9]\+\).*/\1/')
+      c=$(echo $l | sed -e 's/^[^>]*>> *//')
+      d=$(date --date="@$t")
+      n=${c#*:}
+      sn=${n%% //*}
+      echo "[$d]\$ $c"
+    fi
+  done
 }
 
 # Show all notes entered in the active terminal window
@@ -149,10 +190,17 @@ function notes {
   IFS="$OLDIFS"
 }
 
+# grep all history files for a command pattern
+function hgrep {
+  (
+    cd $HOME/.history
+    grep $* $(ls -rt | grep -v $(basename $HISTFILE)) $(basename $HISTFILE)  | grep -v '^[^:]*:#'
+  )
+}
+
 # Focus on the terminal specified by the user.
 function terminal() {
-  HOSTNAME=$(hostname -s)
-  p="${HOSTNAME}"'_.*_'"$1"
+  p="${HIST_IDENTIFIER}"'_.*_'"$1"
   t=$(ls "$HOME/.terminal" | grep "$p")
   if [ -f "$HOME/.terminal/$t" ] ; then
     w=$(cat "$HOME/.terminal/$t")
@@ -207,7 +255,7 @@ function recall {
       else
         echo "# $d"
         echo "\$ $c"
-        grep "#$t :: " $HISTFILE | sed -e 's/^#[0-9]* :: //'
+        grep "#$t :: " $f | sed -e 's/^#[0-9]* :: //'
       fi
     fi
   fi
@@ -224,6 +272,7 @@ function histpush {
     else
       export HISTFILES="$HISTFILES:$HISTFILE"
     fi
+    history -a
     export HISTFILE="$1"
     history -r
   fi
@@ -233,6 +282,7 @@ function histpush {
 function histpop {
   if [ -n "$HISTFILES" ]
   then
+    history -a
     export HISTFILE="${HISTFILES%%:*}"
     history -r
     if [ "${HISTFILES/:/}" == "$HISTFILES" ]
