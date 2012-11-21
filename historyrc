@@ -67,8 +67,20 @@ if [ -n "$DISPLAY" ] && [ -n "$(which wmctrl 2>/dev/null)" ] ; then
   w=$(wmctrl -l | grep "${HIST_IDENTIFIER}${HIST_TTY}" | sed -e 's/ .*//')
   echo $w > "$HOME/.terminal/${HIST_IDENTIFIER}${HIST_TTY}"
 fi
+
+# Ignore a couple common commands, and any command that begins with space
 export HISTIGNORE="&:[ ]*:ls:hist.*:exit"
-export PROMPT_COMMAND="$PROMPT_COMMAND"'; HISTTIMEFORMAT="[%m/%d@%H:%M:%S] " history -a'
+
+# if $PROMPT_COMMAND does not contain 'history', then add our
+# time-formatted history -a customization to it
+if [ "$PROMPT_COMMAND" == "${PROMPT_COMMAND/history/}" ]
+then
+  if [ -n "$PROMPT_COMMAND" ]
+  then
+    export PROMPT_COMMAND="${PROMPT_COMMAND}; "
+  fi
+  export PROMPT_COMMAND="$PROMPT_COMMAND"'HISTTIMEFORMAT="[%m/%d@%H:%M:%S] " history -a'
+fi
 
 # Print command history including execution times, for this run of 'history' only
 alias histt='HISTTIMEFORMAT="[%m/%d@%H:%M:%S]  " history'
