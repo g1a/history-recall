@@ -77,9 +77,13 @@ if [ "$PROMPT_COMMAND" == "${PROMPT_COMMAND/history/}" ]
 then
   if [ -n "$PROMPT_COMMAND" ]
   then
-    export PROMPT_COMMAND="${PROMPT_COMMAND}; "
+    if [ "${PROMPT_COMMAND: -1}" == ';' ] || [ "${PROMPT_COMMAND: -2}" == '; ' ] ; then
+      export PROMPT_COMMAND="${PROMPT_COMMAND} "
+    else
+      export PROMPT_COMMAND="${PROMPT_COMMAND}; "
+    fi
   fi
-  export PROMPT_COMMAND="$PROMPT_COMMAND"'HISTTIMEFORMAT="[%m/%d@%H:%M:%S] " history -a'
+  export PROMPT_COMMAND="$PROMPT_COMMAND"'HISTTIMEFORMAT="[%m/%d@%H:%M:%S] " history -a;'
 fi
 
 # Print command history including execution times, for this run of 'history' only
