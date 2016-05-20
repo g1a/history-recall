@@ -87,7 +87,8 @@ then
 fi
 
 # Print command history including execution times, for this run of 'history' only
-alias histt='HISTTIMEFORMAT="[%m/%d@%H:%M:%S]  " history'
+alias h='HISTTIMEFORMAT="$(tput setaf 2)%m-%d %H:%M$(tput sgr0) " history'
+alias histt=h
 
 # Make a note in command history
 # Usage:
