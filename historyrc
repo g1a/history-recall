@@ -56,9 +56,9 @@ then
   fi
 fi
 
-trap "history_settitle $HIST_TTY; exit" 0
+#trap "history_settitle $HIST_TTY; exit" 0
 export HISTORY_TITLE="${HIST_IDENTIFIER}${HIST_TTY}"
-history_settitle "$HISTORY_TITLE"
+#history_settitle "$HISTORY_TITLE"
 if [ -n "$DISPLAY" ] && [ -n "$(which wmctrl 2>/dev/null)" ] ; then
   # It takes a bit before wmctrl will see the result of the settitle;
   # once we have the window title, write the window id into the
