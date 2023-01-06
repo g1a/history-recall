@@ -46,9 +46,9 @@ then
   # our histfile accessible to the user that owns $HOME.
   if [ "$(basename $HOME)" != "$USER" ]
   then
-    touch $HISTFILE
-    chgrp $(basename $HOME) $HISTFILE
-    chmod g+rw $HISTFILE
+    touch "$HISTFILE"
+    chgrp $(basename $HOME) "$HISTFILE"
+    chmod g+rw "$HISTFILE"
   fi
   if [ -f "$HISTFILE" ]
   then
@@ -112,8 +112,8 @@ function note {
       p[${#p[@]}]="$a";
     fi
   done
-  echo "#$t >>" $* >> $HISTFILE
-  COLUMNS=$((COLUMNS-5-${#t})) "${p[@]}" | sed -e "s/^/#$t :: /" | tee -a $HISTFILE | sed -e 's/^#[^:]*:: //'
+  echo "#$t >>" $* >> "$HISTFILE"
+  COLUMNS=$((COLUMNS-5-${#t})) "${p[@]}" | sed -e "s/^/#$t :: /" | tee -a "$HISTFILE" | sed -e 's/^#[^:]*:: //'
 }
 
 # Begin a new task: switch to a new command history
@@ -145,7 +145,7 @@ function task {
 
 # Complete a task and go back to previous HISTFILE.  Optional.
 function finished {
-  l=$(grep "^#[0-9]\+ :: begin task:" $HISTFILE | tail -n 1)
+  l=$(grep "^#[0-9]\+ :: begin task:" "$HISTFILE" | tail -n 1)
   if [ -z "$l" ]
   then
     echo "finished: no task in progress"
@@ -159,7 +159,7 @@ function finished {
 # Show all active tasks nested in this terminal
 function tasklist {
   # $HISTFILES contains the stack of active tasks for this terminal
-  for f in $HISTFILE $(echo $HISTFILES | tr : ' ') ; do
+  for f in "$HISTFILE" $(echo $HISTFILES | tr : ' ') ; do
     if [ ${f:0:1} != '/' ]
     then
       f="$HOME/.history/$f"
@@ -196,7 +196,7 @@ function tasks {
 function notes {
   OLDIFS="$IFS"
   IFS=$'\n'
-  for l in $(grep -H "^#[0-9]\+ >>.*$*" $HISTFILE) ; do
+  for l in $(grep -H "^#[0-9]\+ >>.*$*" "$HISTFILE") ; do
     t=$(echo $l | sed -e 's/^[^#]*#\([0-9]\+\).*/\1/')
     c=$(echo $l | sed -e 's/^[^>]*>> *//')
     d=$(date --date="@$t")
@@ -211,7 +211,7 @@ function notes {
 function hgrep {
   (
     cd $HOME/.history
-    grep $* $(ls -rt | grep -v $(basename $HISTFILE)) $(basename $HISTFILE)  | grep -v '^[^:]*:#'
+    grep $* $(ls -rt | grep -v "$(basename "$HISTFILE")") "$(basename "$HISTFILE")"  | grep -v '^[^:]*:#'
   )
 }
 
@@ -234,7 +234,7 @@ function terminal() {
 # Show the output of a command passed to 'note', or switch back to a
 # task (and corresponding history file) from the past.
 function recall {
-  l=$(cd  $HOME/.history && grep "^#[0-9]\+ >>.*$*" $(ls -t) $HISTFILE | tail -n 1)
+  l=$(cd  $HOME/.history && grep "^#[0-9]\+ >>.*$*" $(ls -t) "$HISTFILE" | tail -n 1)
   if [ -z "$l" ]
   then
     echo "recall: cannot find $*: No such note or task"
