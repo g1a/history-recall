@@ -123,25 +123,18 @@ The 'task' and 'finished' commands
 INSTALLATION
 ------------
 
-The History Recall commands are all implemented as bash functions
-defined in a single historyrc file.  To install, all that you need
-to do is source this file.  If you are using the [utiliscripts][3]
-project, history-recall is installed automatically via the move-in
-script.  To use history-recall without running move-in, you can follow
-the installation instructions below.
+```
+$ cd $HOME/persistent/install/location
+$ git clone https://github.com/g1a/history-recall.git
+$ cd history-recall
+$ source history-install.sh
+```
 
-First, clone the project from github:
+The `history-install.sh` script will create a `$HOME/.historyrc` file that sources the history recall script. This file will be sourced from your ~/.bash_profile or ~/.bashrc file. This will install history-recall in the active terminal window, but it will not be available in other windows.
 
-    cd ~/local
-    git clone https://github.com/greg-1-anderson/history-recall
+Manual installation is also an option; all that you need to do is source the history-recall.sh script from ~/.bash_profile or ~/.bashrc (or other startup script).
 
-Then source the file when your bash shell starts up.
-
-In ~/.bashrc:
-
-    source ~/local/history-recall/historyrc
-
-Once you have installed History Recall, you must either re-source
+Once you have manually installed History Recall, you must either re-source
 your .bashrc file or close and re-open your terminal windows.
 Once you do this, your bash history will be saved in a separate file
 for each terminal window, and your history will persist across reboots.
