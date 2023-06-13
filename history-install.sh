@@ -48,15 +48,15 @@ fi
 
 # Write our .historyrc file
 cat <<- __EOF__ > $HISTORYRC
-  #!/bin/bash
+	#!/bin/bash
 
-  #
-  # Configuration file for history-recall script
-  # See: https://github.com/g1a/history-recall
-  #
+	#
+	# Configuration file for history-recall script
+	# See: https://github.com/g1a/history-recall
+	#
 
-  # Source history-recall script.
-  source "$SCRIPT_DIR/history-recall.sh"
+	# Source history-recall script.
+	source "$SCRIPT_DIR/history-recall.sh"
 __EOF__
 
 echo 'Created new ~/.historyrc configuration file.'
@@ -69,9 +69,9 @@ fi
 
 cat <<- __EOF__ >> "$HOME/$INSTALL_TO"
 
-  # Source the history-recall configuration file.
-  # See: https://github.com/g1a/history-recall
-  source "$HOME/.historyrc"
+	# Source the history-recall configuration file.
+	# See: https://github.com/g1a/history-recall
+	source "$HOME/.historyrc"
 __EOF__
 
 echo "Installed 'source ~/.historyrc' in ~/$INSTALL_TO"
