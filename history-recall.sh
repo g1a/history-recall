@@ -121,11 +121,11 @@ function note {
 # history over, just in case we did some stuff relevant
 # to the current task before declaring it.
 # Usage:
-#   $ task Install whizzy-fu pro
+#   $ start-task Install whizzy-fu pro
 #   begin task: Install whizzy-fu pro
 #   $ sudu apt-get install whizzyfu libwhizzyfu-dev
 #   $ ... lots of other stuff
-#   $ finished
+#   $ finish-task
 #   finished task: Install whizzy-fu pro
 #
 #   ... a few days later, in a different terminal:
@@ -134,7 +134,7 @@ function note {
 #   recalled task: Install whizzy-fu pro
 #   $ ^Rapt-get
 #   (reverse-i-search)`sudo apt-get': sudo apt-get install whizzyfu libwhizzyfu-dev
-function task {
+function start-task {
   t=$(date "+%s")
   task=$(echo $* | tr A-Z a-z | sed -e 's/ /_/g' -e 's/[^a-z0-9_]//g')
   taskfile="$HOME/.history/task_${HIST_IDENTIFIER}_$task"
@@ -144,7 +144,7 @@ function task {
 }
 
 # Complete a task and go back to previous HISTFILE.  Optional.
-function finished {
+function finish-task {
   l=$(grep "^#[0-9]\+ :: begin task:" "$HISTFILE" | tail -n 1)
   if [ -z "$l" ]
   then
