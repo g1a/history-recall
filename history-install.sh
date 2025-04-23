@@ -5,7 +5,11 @@
 #
 # To install:
 #
-# $ source history-install.sh
+#     $ source history-install.sh [--bashrc | --bash_profile | --profile]
+#
+# By default, this script will install to ~/.bash_profile, unless it looks like
+# ~/.bash_profile sources ~/.bashrc (recommended), in which case we install to ~/.bashrc.
+# You may stipulate the exact install location by providing the appropriate flag.
 #
 
 HISTORYRC="$HOME/.historyrc"
